@@ -12,6 +12,6 @@ NeedsCompilation: no
 Depends: R (>= 3.5.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Packaged: 2024-04-17 05:50:16 UTC; jiaxinhu
+Packaged: 2024-04-17 07:45:10 UTC; jiaxinhu
 Author: Jiaxin Hu [aut, cre]
 Maintainer: Jiaxin Hu <jhu267@wisc.edu>

@@ -154,7 +154,10 @@ result$emp_p_value
 
 # leverage
 leverage = (result$res_original$decomp_result$v_hat)^2
-
+# loading
+loading = result$res_original$decomp_result$u_hat
+# joint differential network
+joint_diff_network = result$res_original$decomp_result$v_hat \%*\% t(result$res_original$decomp_result$v_hat)
 }
 \references{
 Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).

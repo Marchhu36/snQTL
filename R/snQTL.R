@@ -383,7 +383,11 @@ single_QTL_test_stats <- function(seed = NULL, permute = FALSE,
 #'
 #' # leverage
 #' leverage = (result$res_original$decomp_result$v_hat)^2
-#'
+#' # loading
+#' loading = result$res_original$decomp_result$u_hat
+#'# joint differential network
+#'joint_diff_network = result$res_original$decomp_result$v_hat %*% t(result$res_original$decomp_result$v_hat)
+
 
 
 network_QTL_test <- function(exp_list, method = c("sum", "sum_square", "max", "tensor"),
