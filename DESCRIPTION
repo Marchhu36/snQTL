@@ -1,0 +1,17 @@
+Package: snQTL
+Title: A spectral framework to map QTLs affecting joint differential
+        networks of gene co-expression
+Version: 0.1
+Date: 2024-04-16
+Authors@R: 
+    person("Jiaxin", "Hu", , "jhu267@wisc.edu", role = c("aut", "cre"))
+Description: A statistical tool to test the equivalence among three gene co-expression networks via spectral statistics. Reference: Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024). "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." bioRxiv, 2024-03.
+License: GPL (>= 2)
+Encoding: UTF-8
+NeedsCompilation: no
+Depends: R (>= 3.5.0)
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Packaged: 2024-04-17 05:50:16 UTC; jiaxinhu
+Author: Jiaxin Hu [aut, cre]
+Maintainer: Jiaxin Hu <jhu267@wisc.edu>
