@@ -15,7 +15,7 @@ where $A,B,H$ refer to different genotypes, and $N_A, N_B, N_H$ refer to the gen
 
 We propose spectral test statistics for above test, based on tensor/matrix decomposition. Permutation procedure is used to obtain the empirical p-value. 
 
-snQTL takes a list of expression data divided by genotype as input. snQTL outputs the empirical p-value for above test and associated decomposition components, which indicate the gene contribution to the co-expression network changes and compose the joint differential network. 
+snQTL takes a list of expression data divided by genotype (or other factors, e.g., location, treatment) as input. snQTL outputs the empirical p-value for above test and associated decomposition components, which indicate the gene contribution to the co-expression network changes and compose the joint differential network. 
 
 ## Installation
 
