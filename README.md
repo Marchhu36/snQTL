@@ -26,6 +26,8 @@ library("devtools")
 install_github("Marchhu36/snQTL")
 ```
 
+### Main functions
+
 ## Demo
 
 We use synthetic data to illustrate the usage of the main function `network_QTL_test()`. Consider the following setup. 
@@ -121,9 +123,11 @@ joint_diff_network = result$res_original$decomp_result$v_hat %*% t(result$res_or
 ## Generalization
 
 snQTL is a flexible framework to test multiple biological networks. Here, we provide a generalization when samples are separated into $K$ groups based on other interested biological factors (e.g., location, treatment) other than genotype. Then, snQTL tackles the hypothesis testing question:
+
 $$H_0: N_1 = ... = N_K,$$
+
 where $N_k$ refers to the network corresponding to the group $k$. 
 
-The main change compared with the original problem is that we need to consider $K(K-1)/2$ pairwise differential networks. Specifically, we calculate a list of pairwise differential networks $D^{(k,l)} = N_l - N_k$ for all $1 \leq k < l \leq K$. Thus differential tensor $\mathcal{D}$ has dimension $p$-by-$p$-by-$q$, where $q = K(K-1)/2$. We calculate the test statistics based on the matrix spectral statistics for all $D^{(k,l)}$'s or the tensor spectral statistics of $\mathcal{D}$. 
+The main change compared with the original problem is that we need to consider $K(K-1)/2$ pairwise differential networks. Specifically, we calculate a list of pairwise differential networks $D^{(k,l)} = N_l - N_k$ for all $1 \leq k < l \leq K$. Thus differential tensor $\mathcal{D}$ has dimension $p \times p \time q$, where $q = K(K-1)/2$. We calculate the test statistics based on the matrix spectral statistics for all $D^{(k,l)}$'s or the tensor spectral statistics of $\mathcal{D}$. 
 
 Below, we provide a demo for the generalized case. 
