@@ -10,6 +10,7 @@ snQTL is a powerful statistical methods to analyze genotype $\rightarrow$ networ
 Given gene expression read counts and the genotypes of genetic markers from the same set of samples, we want to test whether the gene co-expression networks change significantly across different genotypes. Statistically, snQTL tackles the hypothesis testing problem:
 
 $$H_0: N_A = N_B = N_H,$$
+
 where $A,B,H$ refer to different genotypes, and $N_A, N_B, N_H$ refer to the gene co-expression networks corresponding different genotypes. 
 
 We propose spectral test statistics for above test, based on tensor/matrix decomposition. Permutation procedure is used to obtain the empirical p-value. 
