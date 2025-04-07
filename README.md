@@ -1,7 +1,7 @@
 # snQTL: A spectral framework to map QTLs affecting joint differential networks of gene co-expression
 
 This is the R software for the paper  
-> Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. [bioRxiv](https://www.biorxiv.org/content/10.1101/2024.03.29.587398v1).
+> Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology. [bioRxiv version](https://www.biorxiv.org/content/10.1101/2024.03.29.587398v1).
 
 ## Short introduction to snQTL
 
@@ -118,5 +118,12 @@ loading = result$res_original$decomp_result$u_hat
 joint_diff_network = result$res_original$decomp_result$v_hat %*% t(result$res_original$decomp_result$v_hat)
 ```
 
+## Generalization
 
+snQTL is a flexible framework to test multiple biological networks. Here, we provide a generalization when samples are separated into $K$ groups based on other interested biological factors (e.g., location, treatment) other than genotype. Then, snQTL tackles the hypothesis testing question:
+$$H_0: N_1 = ... = N_K,$$
+where $N_k$ refers to the network corresponding to the group $k$. 
 
+The main change compared with the original problem is that we need to consider $K(K-1)/2$ pairwise differential networks. Specifically, we calculate a list of pairwise differential networks $D^{(k,l)} = N_l - N_k$ for all $1 \leq k < l \leq K$. Thus differential tensor $\mathcal{D}$ has dimension $p$-by-$p$-by-$q$, where $q = K(K-1)/2$. We calculate the test statistics based on the matrix spectral statistics for all $D^{(k,l)}$'s or the tensor spectral statistics of $\mathcal{D}$. 
+
+Below, we provide a demo for the generalized case. 
