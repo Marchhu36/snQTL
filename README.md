@@ -52,7 +52,6 @@ location = c(rep(1,20), rep(2, 50), rep(3, 100), rep(4, 30))
 ```
 **Note**
 
-- In current software, main function generates the co-expression networks from expression read counts through Pearson's correlation. Though, function `net_to_stats()` still works to calculate snQTL test statistics with any given pairwise differential networks generated from other methods. More options for co-expression networks constructions are under development. 
 
 - The input expression read counts are usually normalized and pre-processed with quality control. We skip this part in this demo for simplicity. Our package does not contain the pre-processing functions.
 
