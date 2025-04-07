@@ -1,13 +1,23 @@
-# snQTL -- main functions
+##### snQTL (Generalized) -- main functions and bricks
+##### Jiaxin Hu, Apr 5, 2025
+##### Generalized snQTL for multiple network comparison
 
-# # dependencies -------
-# source("bricks.R")
+# Note:
+# Current version only supports the empirical p-value calculation for correlation networks,
+# since the permutation step shuffles the sample labels and need to RE-GENERATE networks
+# to get a new statistic.
+
+# People may extend this test once the network generation machanism is known.
+
+# # Dependencies (Just for construction)
 # source("symmPMD.R")
 # source("SSTD.R")
 # source("tensor_class.R")
 # source("tensor_product.R")
 
-# Obtain test statistics with multiple networks -------------
+############################# Main functions ##################################
+
+# Key function 1: Differential networks to statistics -------------------------
 
 #' Test statistics for snQTL
 #'
@@ -16,7 +26,7 @@
 #' This function takes a list of differential networks, the choice of test statistics, and other computational tuning parameters as inputs.
 #' Outputs include the calculated statistics, recall of the choice, and the decomposition components associated with the statistics.
 #'
-#' @param network_list list, a list of p-by-p differential networks
+#' @param diffnet_list list, a list of p-by-p differential networks
 #' @param method character, the choice of test statistics; see "details"
 #' @param rho number, a large positive constant adding to the diagonal elements to ensure positive definiteness in symmetric matrix spectral decomposition
 #' @param sumabs number, the number specify the sparsity level in the matrix/tensor eigenvector; \code{sumabs} takes value between \eqn{1/sqrt(p)} and 1, where \eqn{p} is the dimension; \code{sumabs}\eqn{*sqrt(p)} is the upperbound of the L1 norm of the leading matrix/tensor eigenvector (see \code{symmPMD()})
@@ -36,7 +46,7 @@
 #'
 #' @details
 #'
-#' The list \code{network_list} records the pairwise differential networks \eqn{D_{AB}, D_{AH}, D_{AB}}. This package provides four options for test statistics:
+#' The list \code{diffnet_list} records the pairwise differential networks \eqn{D_{AB}, D_{AH}, D_{AB}}. This package provides four options for test statistics:
 #'
 #' \enumerate{
 #' \item{sum}, the sum of sparse leading matrix eigenvalues (sLMEs) of all pairwise differential networks:
@@ -67,15 +77,14 @@
 #' While parameters \code{tensor_iter, tensor_tol, tensor_seed} should be uniquely defined for \code{tensor} method.
 #'
 #' @references Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." bioRxiv, 2024-03.
+#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
 #'
 #' @export
 
-
-
-net_to_stats <- function(network_list, method = c("sum", "sum_square" , "max", "tensor"),
-                         rho = 1000, sumabs = 0.2, niter = 20, trace = FALSE,
-                         tensor_iter = 20, tensor_tol = 10^(-3), tensor_seed = NULL) {
+diffnet_to_snQTL_stats = function(diffnet_list,
+                                  method = c("sum", "sum_square" , "max", "tensor"),
+                                  rho = 1000, sumabs = 0.2, niter = 20, trace = FALSE,
+                                  tensor_iter = 20, tensor_tol = 10^(-3), tensor_seed = NULL){
 
   # given multiple networks, obtain the test statistics by methods
   # this function can be applied to for general types of networks, not only for covariance networks
@@ -86,12 +95,12 @@ net_to_stats <- function(network_list, method = c("sum", "sum_square" , "max", "
   # if method == "sum" or method == "max", decomp_result becomes the list of sLED results for every network
   # if method == "tensor", decomp_result becomes the SSTD outputs of the tensor
 
-  n_num <- length(network_list)
+
+  n_num <- length(diffnet_list)
 
   if (method == "sum" | method == "max" | method == "sum_square") {
-    decomp_result <- lapply(network_list, sLEDTestStat,
-      rho = rho, sumabs.seq = sumabs, niter = niter, trace = trace
-    )
+    decomp_result <- lapply(diffnet_list, sLME,
+                            rho = rho, sumabs.seq = sumabs, niter = niter, trace = trace)
 
     # collect eigenvalue for each network
     eigen_vec <- c()
@@ -110,11 +119,11 @@ net_to_stats <- function(network_list, method = c("sum", "sum_square" , "max", "
   } # sum & max & sum_square
 
   if (method == "tensor") {
-    p <- dim(network_list[[1]])[1]
+    p <- dim(diffnet_list[[1]])[1]
 
     T_obs <- array(0, dim = c(p, p, n_num))
     for (i in 1:n_num) { # networks to tensor
-      T_obs[, , i] <- network_list[[i]]
+      T_obs[, , i] <- diffnet_list[[i]]
     }
 
     # random initialization
@@ -122,17 +131,21 @@ net_to_stats <- function(network_list, method = c("sum", "sum_square" , "max", "
     v_ini <- runif(p, -1, 1)
 
     decomp_result <- SSTD_R1(T_obs, u_ini, v_ini,
-      max_iter = tensor_iter, tol = tensor_tol,
-      rho = rho, sumabs = sumabs, niter = niter
+                             max_iter = tensor_iter, tol = tensor_tol,
+                             rho = rho, sumabs = sumabs, niter = niter
     )
     stats <- decomp_result$gamma_hat
   }
 
-
   return(list(method = method, stats = stats, decomp_result = decomp_result))
 }
 
-# Obtain a single test statistics from expression data ----------------
+
+
+
+
+
+# Key function 2 (Correlation-based): Single test statistics calculation from expression list -------------------------
 
 #' Generate one single snQTL test statistics from expression data
 #'
@@ -170,7 +183,6 @@ net_to_stats <- function(network_list, method = c("sum", "sum_square" , "max", "
 #' In \code{exp_list}, the dimensions for data matrices are n1-by-p, n2-by-p, and n3-by-p, respectively.
 #' The expression data is usually normalized. We use expression data to generate the Pearson's correlation co-expression networks.
 #'
-#'
 #' If \code{permute = TRUE}, we shuffle the samples in three expression matrices while keeping the same dimensions.
 #' The test statistics from randomly shuffled data are considered as the statistics from null distribution.
 #'
@@ -178,16 +190,16 @@ net_to_stats <- function(network_list, method = c("sum", "sum_square" , "max", "
 #' The entries in correlation matrices \eqn{N_{ij} = 0} if gene i and gene j are from the same chromosome or region.
 #'
 #' @references Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." bioRxiv, 2024-03.
+#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
 #'
 #' @export
 
 
-single_QTL_test_stats <- function(seed = NULL, permute = FALSE,
-                                  exp_list, method = c("sum", "sum_square","max", "tensor"),
-                                  rho = 1000, sumabs = 0.2, niter = 20, trace = FALSE, adj.beta = -1,
-                                  tensor_iter = 20, tensor_tol = 10^(-3),
-                                  trans = FALSE, location = NULL) {
+single_exp_to_snQTL_stats = function(seed = NULL, permute = FALSE,
+                                     exp_list, method = c("sum", "sum_square","max", "tensor"),
+                                     rho = 1000, sumabs = 0.2, niter = 20, trace = FALSE, adj.beta = -1,
+                                     tensor_iter = 20, tensor_tol = 10^(-3),
+                                     trans = FALSE, location = NULL){
 
   # expression data in exp_list follows order A, B, and H, sample x genes
   # adj.beta adjust the way to get differential networks
@@ -201,59 +213,41 @@ single_QTL_test_stats <- function(seed = NULL, permute = FALSE,
     set.seed(seed)
   }
 
-  # obtain network_list from exp_list
-  if (!permute) { # no permute
-    network_list <- vector(mode = "list", length = 3)
+  if(!permute){ # no permute
 
-    if(!trans){ # include cis-correlation
-      network_list[[1]] <- getDiffMatrix(exp_list[[1]], exp_list[[2]], adj.beta) # A B
-      network_list[[2]] <- getDiffMatrix(exp_list[[1]], exp_list[[3]], adj.beta) # A H
-      network_list[[3]] <- getDiffMatrix(exp_list[[2]], exp_list[[3]], adj.beta) # B H
-    }else if(trans){ # only trans-correlation
-      network_list[[1]] <- get_trans_diffmatrix(exp_list[[1]], exp_list[[2]], location, adj.beta) # A B
-      network_list[[2]] <- get_trans_diffmatrix(exp_list[[1]], exp_list[[3]], location, adj.beta) # A H
-      network_list[[3]] <- get_trans_diffmatrix(exp_list[[2]], exp_list[[3]], location, adj.beta) # B H
+    diffnet_list = get_diffnet_list_from_exp(exp_list, adj.beta, trans, location)
+
+  }else if (permute){ # permute
+
+    k = length(exp_list)
+    Z = c()
+    n_vec = rep(NA,k)
+    for (i in 1:k) {
+      Z = rbind(Z, exp_list[[i]])
+      n_vec[i] = dim(exp_list[[i]])[1]
     }
 
+    n_list = multi_permuteIndex(n_vec)
 
-  } else if (permute) {
-
-    # collect all expression data
-    Z <- rbind(exp_list[[1]], exp_list[[2]], exp_list[[3]])
-    n1 <- dim(exp_list[[1]])[1]
-    n2 <- dim(exp_list[[2]])[1]
-    n3 <- dim(exp_list[[3]])[1]
-
-    # shuffle labels
-
-    i.permute <- multi_permuteIndex(n1, n2, n3)
-
-    network_list <- vector(mode = "list", length = 3)
-
-    if(!trans){ # include cis-correlation
-      network_list[[1]] <- getDiffMatrix(Z[i.permute$i1, ], Z[i.permute$i2, ], adj.beta) # A B
-      network_list[[2]] <- getDiffMatrix(Z[i.permute$i1, ], Z[i.permute$i3, ], adj.beta) # A H
-      network_list[[3]] <- getDiffMatrix(Z[i.permute$i2, ], Z[i.permute$i3, ], adj.beta) # B H
-    }else if(trans){ # only trans-correlation
-      network_list[[1]] <- get_trans_diffmatrix(Z[i.permute$i1, ], Z[i.permute$i2, ], location, adj.beta) # A B
-      network_list[[2]] <- get_trans_diffmatrix(Z[i.permute$i1, ], Z[i.permute$i3, ], location, adj.beta) # A H
-      network_list[[3]] <- get_trans_diffmatrix(Z[i.permute$i2, ], Z[i.permute$i3, ], location, adj.beta) # B H
+    new_exp_list = vector(mode = "list", length = k)
+    for (i in 1:k) {
+      new_exp_list[[i]] = Z[n_list[[i]], ]
     }
 
-  }
+    diffnet_list = get_diffnet_list_from_exp(new_exp_list, adj.beta, trans, location)
+
+  }# end diffnet_list
 
   # obtain stats
-  res <- net_to_stats(network_list,
-    method = method,
-    rho = rho, sumabs = sumabs, niter = niter, trace = trace,
-    tensor_iter = tensor_iter, tensor_tol = tensor_tol
-  )
+  res <- diffnet_to_snQTL_stats(diffnet_list,
+                      method = method,
+                      rho = rho, sumabs = sumabs, niter = niter, trace = trace,
+                      tensor_iter = tensor_iter, tensor_tol = tensor_tol)
 
-
-  return(list(method = method, permute = permute, stats = res$stats, decomp_result = res$decomp_result, network_list = network_list))
+  return(list(method = method, permute = permute, stats = res$stats, decomp_result = res$decomp_result, diffnet_list = diffnet_list))
 }
 
-# Obtain empirical p-value via permutation from expression data --------
+# Key function 3 (Correlation-based): snQTL test for correlation networks from expression list -------------------------
 
 #' Spectral network quantitative trait loci (snQTL) test
 #'
@@ -269,6 +263,15 @@ single_QTL_test_stats <- function(seed = NULL, permute = FALSE,
 #'
 #' We provide four options for the test statistics, composed by sparse matrix/tensor eigenvalues.
 #' We perform permutation test to obtain the empirical p-values for the hypothesis testing.
+#'
+#' NOTE: This function is also applicable for generalized cases to compare multiple (K > 3) biological networks.
+#' Instead of separating the samples by genotypes, people can separate the samples into K groups based on other interested metrics, e.g., locations, treatments.
+#' The generalized hypothesis testing problem becomes
+#' \deqn{H_0: N_1 = ... = N_K,}
+#' where \eqn{N_k} refers to the correlation-based network corresponding to the group k.
+#' For consistency, we stick with the original genotype-based setting in this help document.
+#' See details and examples for the generalization on the Github manual https://github.com/Marchhu36/snQTL.
+#'
 #'
 #'
 #' @param exp_list list, a list of expression data from samples with different genotypes; the dimensions for data matrices are n1-by-p, n2-by-p, and n3-by-p, respectively; see "details"
@@ -335,7 +338,7 @@ single_QTL_test_stats <- function(seed = NULL, permute = FALSE,
 #'
 #'
 #' @references Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." bioRxiv, 2024-03.
+#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
 #'
 #' @export
 #'
@@ -389,17 +392,15 @@ single_QTL_test_stats <- function(seed = NULL, permute = FALSE,
 #'joint_diff_network = result$res_original$decomp_result$v_hat %*% t(result$res_original$decomp_result$v_hat)
 
 
-
-network_QTL_test <- function(exp_list, method = c("sum", "sum_square", "max", "tensor"),
-                             npermute = 100, seeds = 1:100, stats_seed = NULL,
-                             rho = 1000, sumabs = 0.2, niter = 20, trace = FALSE, adj.beta = -1,
-                             tensor_iter = 20, tensor_tol = 10^(-3),
-                             trans = FALSE, location = NULL) {
+snQTL_test_corrnet = function(exp_list, method = c("sum", "sum_square", "max", "tensor"),
+                              npermute = 100, seeds = 1:100, stats_seed = NULL,
+                              rho = 1000, sumabs = 0.2, niter = 20, trace = FALSE, adj.beta = -1,
+                              tensor_iter = 20, tensor_tol = 10^(-3),
+                              trans = FALSE, location = NULL){
 
   # main network QTL test function
   # no parallel version
   # do not recommend run this function with large expression data, large number of permutations on local PC
-  # expression data in exp_list follows order A, B, and H
 
   # warning
   if(npermute != length(seeds)){
@@ -408,7 +409,7 @@ network_QTL_test <- function(exp_list, method = c("sum", "sum_square", "max", "t
   }
 
   # original stats
-  res_original <- single_QTL_test_stats(
+  res_original <- single_exp_to_snQTL_stats(
     seed = stats_seed, permute = FALSE,
     exp_list = exp_list, method = method,
     rho = rho, sumabs = sumabs, niter = niter, trace = trace, adj.beta = adj.beta,
@@ -416,11 +417,11 @@ network_QTL_test <- function(exp_list, method = c("sum", "sum_square", "max", "t
     trans, location
   )
   # permutation results
-  res_permute <- lapply(seeds, single_QTL_test_stats,
-    permute = TRUE, exp_list = exp_list, method = method,
-    rho = rho, sumabs = sumabs, niter = niter, trace = trace, adj.beta = adj.beta,
-    tensor_iter = tensor_iter, tensor_tol = tensor_tol,
-    trans, location
+  res_permute <- lapply(seeds, single_exp_to_snQTL_stats,
+                        permute = TRUE, exp_list = exp_list, method = method,
+                        rho = rho, sumabs = sumabs, niter = niter, trace = trace, adj.beta = adj.beta,
+                        tensor_iter = tensor_iter, tensor_tol = tensor_tol,
+                        trans, location
   )
 
   # calculate empirical p value
@@ -433,3 +434,218 @@ network_QTL_test <- function(exp_list, method = c("sum", "sum_square", "max", "t
 
   return(list(method = method, res_original = res_original, res_permute = res_permute, emp_p_value = emp_p_value))
 }
+
+############################# Bricks ##########################################
+
+# Brick function 1: sLME for matrices (from sLED test) --------------------------
+#' Calculate of sLME for matrices
+#'
+#' @description
+#' Calculate the sLME given a matrix \eqn{D}.
+#' For any symmetric matrix \eqn{D}, sLME test statistic is defined as
+#' \deqn{max{ sEig(D), sEig(-D) }}
+#' where \code{sEig()} is the sparse leading eigenvalue, defined as
+#' \deqn{$max_{v} v^T A v$}{max_{v} t(v)*A*v}
+#' subject to
+#' \eqn{$||v||_2 \leq 1, ||v||_1 \leq s$}{||v||_2 <= 1, ||v||_1 <= s}.
+#'
+#' @param Dmat p-by-p numeric matrix, the differential matrix
+#' @param rho a large positive constant such that \eqn{D+diag(rep(rho, p))} and \eqn{-D+diag(rep(rho, p))}
+#'        are positive definite.
+#' @param sumabs.seq a numeric vector specifing the sequence of sparsity parameters, each between \eqn{1/sqrt(p)} and 1.
+#'        Each sumabs*\eqn{$sqrt(p)$}{sqrt(p)} is the upperbound of the L_1 norm of leading sparse eigenvector \eqn{v}.
+#' @param niter the number of iterations to use in the PMD algorithm (see \code{symmPMD()})
+#' @param trace whether to trace the progress of PMD algorithm (see \code{symmPMD()})
+#'
+#' @return A list containing the following components:
+#'  \item{sumabs.seq}{the sequence of sparsity parameters}
+#'  \item{rho}{a positive constant to augment the diagonal of the differential matrix
+#'            such that \eqn{D + rho*I} becomes positive definite.}
+#'  \item{stats}{a numeric vector of test statistics when using different sparsity parameters
+#'            (corresponding to \code{sumabs.seq}).}
+#'  \item{sign}{a vector of signs when using different sparsity parameters (corresponding to \code{sumabs.seq}).
+#'          Sign is "pos" if the test statistic is given by sEig(D), and "neg" if is given by sEig(-D),
+#'          where \code{sEig} denotes the sparse leading eigenvalue.}
+#'  \item{v}{the sequence of sparse leading eigenvectors, each row corresponds to one sparsity
+#'          parameter given by \code{sumabs.seq}.}
+#'  \item{leverage}{the leverage score for genes (defined as \eqn{v^2} element-wise) using
+#'          different sparsity parameters. Each row corresponds to one sparsity
+#'          parameter given by \code{sumabs.seq}.}
+#'
+#' @references Zhu, Lei, Devlin and Roeder (2016), "Testing High Dimensional Covariance Matrices,
+#' with Application to Detecting Schizophrenia Risk Genes", arXiv:1606.00252.
+#'
+#' @export
+
+sLME = function(Dmat, rho=1000, sumabs.seq=0.2,
+                niter=20, trace=FALSE){
+  ndim <- 1 ## only consider the first sparse eigenvector
+  p <- ncol(Dmat)
+  ntest <- length(sumabs.seq)
+
+  results <- list()
+  results$sumabs.seq <- sumabs.seq
+  results$rho <- rho
+
+  results$stats <- rep(NA, ntest)
+  results$sign <- rep(NA, ntest)
+  results$v <- matrix(NA, nrow=ntest, ncol=p)
+  results$leverage <- matrix(NA, nrow=ntest, ncol=p)
+
+  ## for each sparsity parameter
+  for (i in 1:ntest) {
+    sumabs <- sumabs.seq[i]
+    pos.out <- symmPMD(Dmat + rho * diag(p),
+                       sumabs=sumabs, trace=trace, niter=niter)
+    neg.out <- symmPMD(- Dmat + rho * diag(p),
+                       sumabs=sumabs, trace=trace, niter=niter)
+
+    if (pos.out$d >= neg.out$d) {
+      results$sign[i] <- "pos"
+      results$stats[i] <- pos.out$d - rho
+      results$v[i, ] <- pos.out$v
+      results$leverage[i, ] <- (pos.out$v)^2
+    } else {
+      results$sign[i] <- "neg"
+      results$stats[i] <- neg.out$d - rho
+      results$v[i, ] <- neg.out$v
+      results$leverage[i, ] <- (neg.out$v)^2
+    }
+  }
+
+  return(results)
+}
+
+# Brick function 2: get a list of differential matrices between multiple networks ------------------
+
+# get difference matrix ----------
+
+#' Get the list of differential matrix from a list of expression data
+#'
+#' @description Given a list of expression data, \eqn{X_1, ..., X_K}, compute the list of differential matrix
+#' \deqn{D^{(k,l)} = N(X_l) - N(X_k), k < l, }
+#' where N() is the covariance matrix, or the weighted adjacency matrices defined as
+#' \deqn{N_{ij} = |corr(i, j)|^beta}
+#' for some constant beta > 0, 1 <= i, j <= p.
+#' Let N represent the regular correlation matrix when beta=0, and covariance matrix when beta<0.
+#' In total, we will have K*(K-1)/2 pairwise differential networks in the list.
+#'
+#'
+#' If \code{trans = TRUE}, we let \eqn{N_{ij} = 0} if \eqn{i, j} are from the same region based on \code{location}.
+#' Under gene co-expression context, trans-correlation usually refer to the correlation between
+#' two genes \eqn{i, j} from two chromosomes.
+#'
+#' @param exp_list a list of nk-by-p matrices from the K populations.
+#'        Rows are samples/observations, while columns are the features.
+#' @param adj.beta Power to transform correlation matrices to weighted adjacency matrices
+#'        by \eqn{N_{ij} = |r_ij|^adj.beta} where \eqn{r_ij} represents the Pearson's correlation.
+#'        When \code{adj.beta=0}, the correlation marix is used.
+#'        When \code{adj.beta<0}, the covariance matrix is used.
+#'        The default value is \code{adj.beta=-1}.
+#' @param trans logic variable, whether to only consider the trans-correlation (between genes from two different chromosomes or regions)
+#' @param location vector, the (chromosome) locations for items
+#'
+#'
+#'
+#' @return A list of p-by-p differential matrix \eqn{D^{(k,l)}, k < l}.
+#'
+#' @export
+
+
+get_diffnet_list_from_exp = function(exp_list, adj.beta = -1, trans = FALSE, location = NULL){
+
+  # net_list, list of networks
+  k = length(exp_list)
+
+  # collect all k(k-1)/2 pairwise diffnet
+  diffnet_list = vector(mode = "list", length = k*(k-1)/2)
+  name_vec = rep(NA, k*(k-1)/2)
+  count = 1
+  for (i in 1:(k-1)) {
+    for (j in (i+1):k) {
+      diffnet_list[[count]] = get_diffnet_from_exp(exp_list[[j]], exp_list[[i]], adj.beta, trans, location)
+      name_vec[count] = paste0(i,"-",j)
+      count = count + 1
+    }
+  }
+  names(diffnet_list) = name_vec
+
+  return(diffnet_list)
+}
+
+# Brick function 2: get pairwise correlation differential network from expression ------------------
+# get difference matrix ----------
+
+#' The differential matrix
+#'
+#' @description Given observations from two populations X and Y,
+#' compute the differential matrix
+#' \deqn{D = N(Y) - N(X)}
+#' where N() is the covariance matrix, or the weighted adjacency matrices defined as
+#' \deqn{N_{ij} = |corr(i, j)|^beta}
+#' for some constant beta > 0, 1 <= i, j <= p.
+#' Let N represent the regular correlation matrix when beta=0, and covariance matrix when beta<0.
+#'
+#' @param X n1-by-p matrix for samples from the first population.
+#'        Rows are samples/observations, while columns are the features.
+#' @param Y n2-by-p matrix for samples from the second population.
+#'        Rows are samples/observations, while columns are the features.
+#' @param adj.beta Power to transform correlation matrices to weighted adjacency matrices
+#'        by \eqn{N_{ij} = |r_ij|^adj.beta} where \eqn{r_ij} represents the Pearson's correlation.
+#'        When \code{adj.beta=0}, the correlation marix is used.
+#'        When \code{adj.beta<0}, the covariance matrix is used.
+#'        The default value is \code{adj.beta=-1}.
+#'@param trans logic variable, whether to only consider the trans-correlation (between genes from two different chromosomes or regions); see "details"
+#' @param location vector, the (chromosome) locations for items
+#'
+#' @return The p-by-p differential matrix \eqn{D = N(Y) - N(X)}.
+#'
+#' @export
+
+get_diffnet_from_exp = function(X, Y, adj.beta = -1, trans = FALSE, location = NULL){
+
+  if (adj.beta < 0) {
+    Dmat <- cov(Y) - cov(X)
+  } else if (adj.beta == 0) {
+    Dmat <- cor(Y) - cor(X)
+  } else {
+    Dmat <- abs(cor(Y))^adj.beta - abs(cor(X))^adj.beta
+  }
+
+  if(trans){
+    # location: the locations of each gene, only positive numbers refer to a valid location
+    locs = unique(location)[unique(location) >= 0]
+    for (i in locs) {
+      ind_vec = location == i
+      # delete the entries when two loci within the same location
+      Dmat[ind_vec, ind_vec] = 0
+    }
+  }
+
+  return(Dmat)
+}
+
+# Tools --------------------------------
+
+normalize <- function(x) {
+  return(x / sqrt(sum(x^2)))
+}
+
+multi_permuteIndex <- function(n_vec){
+
+  # n_vec = c(n1, n2, ..., nk)
+
+  n_sum = sum(n_vec)
+  k = length(n_vec)
+  i.sample <- sample(1:n_sum, replace=FALSE)
+
+  start_tmp = 1
+  n_list = vector(mode = "list", length = k)
+  for (j in 1:k) {
+    n_list[[j]] = i.sample[start_tmp:(start_tmp+n_vec[j]-1)]
+    start_tmp = start_tmp+n_vec[j]
+  }
+
+ return(n_list)
+}
+
