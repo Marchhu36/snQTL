@@ -128,6 +128,6 @@ $$H_0: N_1 = ... = N_K,$$
 
 where $N_k$ refers to the network corresponding to the group $k$. 
 
-The main change compared with the original problem is that we need to consider $K(K-1)/2$ pairwise differential networks. Specifically, we calculate a list of pairwise differential networks $D^{(k,l)} = N_l - N_k$ for all $1 \leq k < l \leq K$. Thus differential tensor $\mathcal{D}$ has dimension $p \times p \time q$, where $q = K(K-1)/2$. We calculate the test statistics based on the matrix spectral statistics for all $D^{(k,l)}$'s or the tensor spectral statistics of $\mathcal{D}$. 
+The main change compared with the original problem is that we need to consider $K(K-1)/2$ pairwise differential networks. Specifically, we calculate a list of pairwise differential networks $D^{(k,l)} = N_l - N_k$ for all $1 \leq k < l \leq K$. Thus differential tensor $\mathcal{D}$ has dimension $p \times p \times q$, where $q = K(K-1)/2$. We calculate the test statistics based on the matrix spectral statistics for all $D^{(k,l)}$'s or the tensor spectral statistics of $\mathcal{D}$. 
 
 Below, we provide a demo for the generalized case. 
