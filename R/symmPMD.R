@@ -13,7 +13,7 @@
 #' using the extra constraint that the decomposition is symmetric.
 #'
 #' @param x p-by-p matrix, symmetric and positive definite
-#' @param sumabs sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v},
+#' @param sumabs sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{v}{v},
 #'       controling the sparsity of solution. Must be between \eqn{1/sqrt(p)}{1/sqrt(p)} and 1.
 #' @param v the starting value of the algorithm, either a pre-calculated first singular vector of x, or NULL.
 #' @param niter number of iterations to perform the iterative optimizations
@@ -22,7 +22,7 @@
 #' @return A list containing the following components:
 #'  \item{v}{the sparse leading eigenvector v}
 #'  \item{d}{the sparse leading eigenvalue \eqn{d=v^T A v}{d=t(v)*A*v }}
-#'  \item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v}}
+#'  \item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{v}{v}}
 #'
 #' @references Zhu, Lingxue, et al. "Testing high-dimensional covariance matrices, with application to detecting schizophrenia risk genes." The annals of applied statistics 11.3 (2017): 1810.
 #' @references Witten, Tibshirani and Hastie (2009), "A penalized matrix decomposition,

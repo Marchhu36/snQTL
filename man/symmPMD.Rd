@@ -9,7 +9,7 @@ symmPMD(x, sumabs = 0.3, niter = 50, v = NULL, trace = TRUE)
 \arguments{
 \item{x}{p-by-p matrix, symmetric and positive definite}
 
-\item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v},
+\item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{v}{v},
 controling the sparsity of solution. Must be between \eqn{1/sqrt(p)}{1/sqrt(p)} and 1.}
 
 \item{niter}{number of iterations to perform the iterative optimizations}
@@ -22,7 +22,7 @@ controling the sparsity of solution. Must be between \eqn{1/sqrt(p)}{1/sqrt(p)} 
 A list containing the following components:
 \item{v}{the sparse leading eigenvector v}
 \item{d}{the sparse leading eigenvalue \eqn{d=v^T A v}{d=t(v)*A*v }}
-\item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v}}
+\item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{v}{v}}
 }
 \description{
 This function solves for the Sparse Principal Component Analysis given
