@@ -1,7 +1,7 @@
 # snQTL: A spectral framework to map QTLs affecting joint differential networks of gene co-expression
 
 This is the R software for the paper  
-> Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology. [bioRxiv version](https://www.biorxiv.org/content/10.1101/2024.03.29.587398v1).
+> Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953. [PLOS](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1012953) [bioRxiv version](https://www.biorxiv.org/content/10.1101/2024.03.29.587398v1).
 
 ## Short introduction to snQTL
 
