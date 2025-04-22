@@ -15,6 +15,7 @@
 # source("tensor_class.R")
 # source("tensor_product.R")
 
+
 ############################# Main functions ##################################
 
 # Key function 1: Differential networks to statistics -------------------------
@@ -76,8 +77,7 @@
 #' Since \code{symmPMD()} is used in \code{SSTD()}, parameters for \code{symmPMD()} are used for \code{SSTD()}.
 #' While parameters \code{tensor_iter, tensor_tol, tensor_seed} should be uniquely defined for \code{tensor} method.
 #'
-#' @references Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
+#' @references  Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 #'
 #' @export
 
@@ -189,8 +189,7 @@ diffnet_to_snQTL_stats = function(diffnet_list,
 #' If \code{trans = TRUE}, we only consider the trans-correlation between the genes from two different chromosomes or regions in co-expression networks.
 #' The entries in correlation matrices \eqn{N_{ij} = 0} if gene i and gene j are from the same chromosome or region.
 #'
-#' @references Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
+#' @references  Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 #'
 #' @export
 
@@ -337,8 +336,7 @@ single_exp_to_snQTL_stats = function(seed = NULL, permute = FALSE,
 #' The gene location information is required if \code{trans = TRUE}.
 #'
 #'
-#' @references Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-#' "A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
+#' @references  Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 #'
 #' @export
 #'
@@ -360,37 +358,11 @@ single_exp_to_snQTL_stats = function(seed = NULL, permute = FALSE,
 #'
 #' exp_list = list(exp1, exp2, exp3)
 #'
-#' result = network_QTL_test(exp_list = exp_list, method = 'tensor',
-#'                           npermute = 100, seeds = 1:100, stats_seed = 0416,
+#' result = snQTL_test_corrnet(exp_list = exp_list, method = 'tensor',
+#'                           npermute = 30, seeds = 1:30, stats_seed = 0416,
 #'                           trans = TRUE, location = location)
 #'
 #' result$emp_p_value
-#'
-#' ## expression data from alternative
-#' Sigma = diag(p)
-#' # trans-correlation
-#' Sigma[20:50, 20:50] = Sigma[20:50, 20:50] + 0.5
-#'
-#' set.seed(0416) # random seeds for example data
-#' exp1 = matrix(rnorm(n1*p, mean = 0, sd = 1), nrow = n1)
-#' exp2 = matrix(rnorm(n2*p, mean = 0, sd = 1), nrow = n2)
-#' exp3 = MASS::mvrnorm(n3, mu = rep(0,p), Sigma = Sigma)
-#'
-#' exp_list = list(exp1, exp2, exp3)
-#'
-#' result = network_QTL_test(exp_list = exp_list, method = 'tensor',
-#'                           npermute = 100, seeds = 1:100, stats_seed = 0416,
-#'                           trans = TRUE, location = location)
-#'
-#' result$emp_p_value
-#'
-#' # leverage
-#' leverage = (result$res_original$decomp_result$v_hat)^2
-#' # loading
-#' loading = result$res_original$decomp_result$u_hat
-#'# joint differential network
-#'joint_diff_network = result$res_original$decomp_result$v_hat %*% t(result$res_original$decomp_result$v_hat)
-
 
 snQTL_test_corrnet = function(exp_list, method = c("sum", "sum_square", "max", "tensor"),
                               npermute = 100, seeds = 1:100, stats_seed = NULL,
@@ -445,15 +417,15 @@ snQTL_test_corrnet = function(exp_list, method = c("sum", "sum_square", "max", "
 #' For any symmetric matrix \eqn{D}, sLME test statistic is defined as
 #' \deqn{max{ sEig(D), sEig(-D) }}
 #' where \code{sEig()} is the sparse leading eigenvalue, defined as
-#' \deqn{$max_{v} v^T A v$}{max_{v} t(v)*A*v}
+#' \deqn{max_{v} v^T A v}{max_{v} t(v) *A* v}
 #' subject to
-#' \eqn{$||v||_2 \leq 1, ||v||_1 \leq s$}{||v||_2 <= 1, ||v||_1 <= s}.
+#' \eqn{||v||_2 \leq 1, ||v||_1 \leq s}{||v||_2 <= 1, ||v||_1 <= s}.
 #'
 #' @param Dmat p-by-p numeric matrix, the differential matrix
 #' @param rho a large positive constant such that \eqn{D+diag(rep(rho, p))} and \eqn{-D+diag(rep(rho, p))}
 #'        are positive definite.
 #' @param sumabs.seq a numeric vector specifing the sequence of sparsity parameters, each between \eqn{1/sqrt(p)} and 1.
-#'        Each sumabs*\eqn{$sqrt(p)$}{sqrt(p)} is the upperbound of the L_1 norm of leading sparse eigenvector \eqn{v}.
+#'        Each sumabs*\eqn{\sqrt{p}} is the upperbound of the L_1 norm of leading sparse eigenvector \eqn{v}.
 #' @param niter the number of iterations to use in the PMD algorithm (see \code{symmPMD()})
 #' @param trace whether to trace the progress of PMD algorithm (see \code{symmPMD()})
 #'
@@ -472,8 +444,7 @@ snQTL_test_corrnet = function(exp_list, method = c("sum", "sum_square", "max", "
 #'          different sparsity parameters. Each row corresponds to one sparsity
 #'          parameter given by \code{sumabs.seq}.}
 #'
-#' @references Zhu, Lei, Devlin and Roeder (2016), "Testing High Dimensional Covariance Matrices,
-#' with Application to Detecting Schizophrenia Risk Genes", arXiv:1606.00252.
+#' @references Zhu, Lingxue, et al. "Testing high-dimensional covariance matrices, with application to detecting schizophrenia risk genes." The annals of applied statistics 11.3 (2017): 1810.
 #'
 #' @export
 

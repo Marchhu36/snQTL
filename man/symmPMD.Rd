@@ -9,8 +9,8 @@ symmPMD(x, sumabs = 0.3, niter = 50, v = NULL, trace = TRUE)
 \arguments{
 \item{x}{p-by-p matrix, symmetric and positive definite}
 
-\item{sumabs}{sumabs*\eqn{$sqrt(p)$}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v},
-controling the sparsity of solution. Must be between \eqn{$1/sqrt(p)$}{1/sqrt(p)} and 1.}
+\item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v},
+controling the sparsity of solution. Must be between \eqn{1/sqrt(p)}{1/sqrt(p)} and 1.}
 
 \item{niter}{number of iterations to perform the iterative optimizations}
 
@@ -21,24 +21,23 @@ controling the sparsity of solution. Must be between \eqn{$1/sqrt(p)$}{1/sqrt(p)
 \value{
 A list containing the following components:
 \item{v}{the sparse leading eigenvector v}
-\item{d}{the sparse leading eigenvalue \eqn{$d=v^T A v$}{d=t(v)*A*v }}
-\item{sumabs}{sumabs*\eqn{$sqrt(p)$}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v}}
+\item{d}{the sparse leading eigenvalue \eqn{d=v^T A v}{d=t(v)*A*v }}
+\item{sumabs}{sumabs*\eqn{sqrt(p)}{sqrt(p)} is the upperbound of the L_1 norm of \eqn{$v$}{v}}
 }
 \description{
 This function solves for the Sparse Principal Component Analysis given
 a positive definite matrix A:
-\deqn{$max_{v} v^T A v$}{max_{v} t(v)*A*v}
+\deqn{max_{v} v^T A v}{max_{v} t(v)*A*v}
 subject to
-\deqn{$||v||_2 \leq 1, ||v||_1 \leq s$}{||v||_2 <= 1, ||v||_1 <= s}
+\deqn{||v||_2 \leq 1, ||v||_1 \leq s}{||v||_2 <= 1, ||v||_1 <= s}
 The solution v is the sparse leading eigenvector, and the corresponding objective
-\eqn{$v^T A v$}{t(v)*A*v} is the sparse leading engenvalue.
+\eqn{v^T A v}{t(v)*A*v} is the sparse leading engenvalue.
 
 The algorithm uses an iterative procedure similar to the R Package "PMA", but speeds up the computation
 using the extra constraint that the decomposition is symmetric.
 }
 \references{
-Zhu, Lei, Devlin and Roeder (2016), "Testing High Dimensional Covariance Matrices,
-with Application to Detecting Schizophrenia Risk Genes", arXiv:1606.00252.
+Zhu, Lingxue, et al. "Testing high-dimensional covariance matrices, with application to detecting schizophrenia risk genes." The annals of applied statistics 11.3 (2017): 1810.
 
 Witten, Tibshirani and Hastie (2009), "A penalized matrix decomposition,
 with applications to sparse principal components and canonical correlation analysis", Biostatistics 10(3):515-534.

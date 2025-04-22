@@ -94,7 +94,7 @@ setMethod(f = 'dim', signature = 'Tensor', function(x) x@modes)
 #'
 #\code{\link{vec-methods}} returns the vectorization of the tensor.
 
-#'
+
 #'@details \code{unfold(tnsr,row_idx=NULL,col_idx=NULL)}
 #'@export
 #'@docType methods
@@ -135,6 +135,7 @@ setMethod("unfold", signature="Tensor",
           })
 
 
+#' Tensor Row Space Unfolding
 #'@docType methods
 #'@name rs_unfold-methods
 #'@details \code{rs_unfold(tnsr,m=NULL)}
@@ -160,7 +161,8 @@ setMethod("rs_unfold", signature="Tensor",
 
 
 
-#'
+
+#' Tensor Column Space Unfolding
 #'@docType methods
 #'@name cs_unfold-methods
 #'@details \code{cs_unfold(tnsr,m=NULL)}
@@ -183,7 +185,7 @@ setMethod("cs_unfold", signature="Tensor",
             unfold(tnsr,row_idx=rs,col_idx=cs)
           })
 
-# old <- options()         
+# old <- options()
 # on.exit(options(old))
 # options(warn=1)
 
@@ -219,7 +221,7 @@ fold <- function(mat, row_idx = NULL, col_idx = NULL, modes=NULL){
     if(!is.matrix(mat))  stop("mat must be of class 'matrix'")
   }else{
     stopifnot(mat@num_modes==2)
-    mat <- mat@data			
+    mat <- mat@data
   }
   num_modes <- length(modes)
   stopifnot(num_modes==length(rs)+length(cs))
@@ -230,9 +232,7 @@ fold <- function(mat, row_idx = NULL, col_idx = NULL, modes=NULL){
   as.tensor(aperm(array(mat,dim=c(modes[rs],modes[cs])),iperm))
 }
 
-
-
-#'@export
+#'Conformable elementwise operators for Tensor
 #'@name Ops-methods
 #'@docType methods
 #'@aliases Ops-methods Ops,Tensor,Tensor-method Ops,Tensor,array-method Ops,Tensor,numeric-method Ops,array,Tensor-method Ops,numeric,Tensor-method

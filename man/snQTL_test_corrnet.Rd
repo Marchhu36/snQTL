@@ -136,38 +136,12 @@ exp3 = matrix(rnorm(n3*p, mean = 0, sd = 1), nrow = n3)
 
 exp_list = list(exp1, exp2, exp3)
 
-result = network_QTL_test(exp_list = exp_list, method = 'tensor',
-                          npermute = 100, seeds = 1:100, stats_seed = 0416,
+result = snQTL_test_corrnet(exp_list = exp_list, method = 'tensor',
+                          npermute = 30, seeds = 1:30, stats_seed = 0416,
                           trans = TRUE, location = location)
 
 result$emp_p_value
-
-## expression data from alternative
-Sigma = diag(p)
-# trans-correlation
-Sigma[20:50, 20:50] = Sigma[20:50, 20:50] + 0.5
-
-set.seed(0416) # random seeds for example data
-exp1 = matrix(rnorm(n1*p, mean = 0, sd = 1), nrow = n1)
-exp2 = matrix(rnorm(n2*p, mean = 0, sd = 1), nrow = n2)
-exp3 = MASS::mvrnorm(n3, mu = rep(0,p), Sigma = Sigma)
-
-exp_list = list(exp1, exp2, exp3)
-
-result = network_QTL_test(exp_list = exp_list, method = 'tensor',
-                          npermute = 100, seeds = 1:100, stats_seed = 0416,
-                          trans = TRUE, location = location)
-
-result$emp_p_value
-
-# leverage
-leverage = (result$res_original$decomp_result$v_hat)^2
-# loading
-loading = result$res_original$decomp_result$u_hat
-# joint differential network
-joint_diff_network = result$res_original$decomp_result$v_hat \%*\% t(result$res_original$decomp_result$v_hat)
 }
 \references{
-Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-"A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
+Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 }

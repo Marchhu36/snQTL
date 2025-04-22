@@ -56,8 +56,7 @@ The solution \eqn{\Lambda} is the sparse leading tensor eigenvalue (sLTE),
 The Symmetric Penalized Matrix Decomposition \code{symmPMD()} is used in the iterative algorithm.
 }
 \references{
-Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-"A spectral framework to map QTLs affecting joint differential networks of gene co-expression." bioRxiv, 2024-03.
+Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 
 Sun, W. W., Lu, J., Liu, H., & Cheng, G. (2017). "Provable sparse tensor decomposition."
 Journal of the Royal Statistical Society Series B: Statistical Methodology, 79(3), 899-916.

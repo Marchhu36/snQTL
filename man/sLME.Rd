@@ -13,7 +13,7 @@ sLME(Dmat, rho = 1000, sumabs.seq = 0.2, niter = 20, trace = FALSE)
 are positive definite.}
 
 \item{sumabs.seq}{a numeric vector specifing the sequence of sparsity parameters, each between \eqn{1/sqrt(p)} and 1.
-Each sumabs*\eqn{$sqrt(p)$}{sqrt(p)} is the upperbound of the L_1 norm of leading sparse eigenvector \eqn{v}.}
+Each sumabs*\eqn{\sqrt{p}} is the upperbound of the L_1 norm of leading sparse eigenvector \eqn{v}.}
 
 \item{niter}{the number of iterations to use in the PMD algorithm (see \code{symmPMD()})}
 
@@ -40,11 +40,10 @@ Calculate the sLME given a matrix \eqn{D}.
 For any symmetric matrix \eqn{D}, sLME test statistic is defined as
 \deqn{max{ sEig(D), sEig(-D) }}
 where \code{sEig()} is the sparse leading eigenvalue, defined as
-\deqn{$max_{v} v^T A v$}{max_{v} t(v)*A*v}
+\deqn{max_{v} v^T A v}{max_{v} t(v) *A* v}
 subject to
-\eqn{$||v||_2 \leq 1, ||v||_1 \leq s$}{||v||_2 <= 1, ||v||_1 <= s}.
+\eqn{||v||_2 \leq 1, ||v||_1 \leq s}{||v||_2 <= 1, ||v||_1 <= s}.
 }
 \references{
-Zhu, Lei, Devlin and Roeder (2016), "Testing High Dimensional Covariance Matrices,
-with Application to Detecting Schizophrenia Risk Genes", arXiv:1606.00252.
+Zhu, Lingxue, et al. "Testing high-dimensional covariance matrices, with application to detecting schizophrenia risk genes." The annals of applied statistics 11.3 (2017): 1810.
 }

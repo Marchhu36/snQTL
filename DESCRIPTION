@@ -1,22 +1,16 @@
 Package: snQTL
-Title: A spectral framework to map QTLs affecting joint differential
-        networks of gene co-expression
+Title: A Spectral Framework to Map QTLs Affecting Joint Differential Networks of Gene Co-Expression
 Version: 0.2
 Date: 2025-04-05
-Authors@R: 
-    person("Jiaxin", "Hu", , "hjx_2025@outlook.com", role = c("aut", "cre"))
-Description: A statistical tool to test the equivalence among multiple biological networks via spectral statistics. 
-Reference: Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick,
-        D. I., & Wang, M. (2025). "A spectral framework to map QTLs
-        affecting joint differential networks of gene co-expression."
-        PLOS Computational Biology.
+Authors@R: c(person(given = "Jiaxin",family = "Hu",role = c("aut", "cre","cph"),email = "hjx_2025@outlook.com"), person(given = "Miaoyan",family = "Wang",role = c("aut", "cph"),email = "miaoyan.wang@wisc.edu")) 
+Maintainer: Jiaxin Hu <hjx_2025@outlook.com>
+Author: Jiaxin Hu [aut, cre, cph], Miaoyan Wang [aut, cph]
+Description: A statistical tool to test the equivalence among multiple biological networks via spectral statistics. See reference: Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 License: GPL (>= 2)
 Encoding: UTF-8
+LazyData: true
 NeedsCompilation: no
-Imports: rARPACK, MASS
+Imports: rARPACK, MASS, methods
 Depends: R (>= 3.5.0)
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
-Packaged: 2025-04-07 04:07:34 UTC; jiaxinhu
-Author: Jiaxin Hu [aut, cre]
-Maintainer: Jiaxin Hu <hjx_2025@outlook.com>

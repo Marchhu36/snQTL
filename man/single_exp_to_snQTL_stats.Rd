@@ -75,6 +75,5 @@ If \code{trans = TRUE}, we only consider the trans-correlation between the genes
 The entries in correlation matrices \eqn{N_{ij} = 0} if gene i and gene j are from the same chromosome or region.
 }
 \references{
-Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-"A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
+Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 }

@@ -81,6 +81,5 @@ Since \code{symmPMD()} is used in \code{SSTD()}, parameters for \code{symmPMD()}
 While parameters \code{tensor_iter, tensor_tol, tensor_seed} should be uniquely defined for \code{tensor} method.
 }
 \references{
-Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2024).
-"A spectral framework to map QTLs affecting joint differential networks of gene co-expression." PLOS Computational Biology.
+Hu, J., Weber, J. N., Fuess, L. E., Steinel, N. C., Bolnick, D. I., & Wang, M. (2025). A spectral framework to map QTLs affecting joint differential networks of gene co-expression. PLOS Computational Biology, 21(4), e1012953.
 }

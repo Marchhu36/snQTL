@@ -9,8 +9,8 @@ solvePMD(x, sumabsv, v, niter = 50, trace = TRUE)
 \arguments{
 \item{x}{p-by-p matrix, symmetric and positive definite}
 
-\item{sumabsv}{the upperbound of the L_1 norm of \eqn{$v$}{v}, controling the sparsity of solution.
-Must be between 1 and \eqn{$sqrt(p)$}{sqrt(p)}.}
+\item{sumabsv}{the upperbound of the L_1 norm of \eqn{v}{v}, controlling the sparsity of solution.
+Must be between 1 and \eqn{sqrt(p)}{sqrt(p)}.}
 
 \item{v}{the starting value of the algorithm.}
 
@@ -21,17 +21,17 @@ Must be between 1 and \eqn{$sqrt(p)$}{sqrt(p)}.}
 \value{
 A list containing the following components:
 \item{v}{the sparse leading eigenvector v}
-\item{d}{the sparse leading eigenvalue \eqn{$d=v^T A v$}{d=t(v)*A*v }}
+\item{d}{the sparse leading eigenvalue \eqn{d=v^T A v}{d=t(v)*A*v }}
 \item{v.init}{the initial value of v}
 }
 \description{
 An iterative algorithm that solves the Sparse Principal Component Analysis problem: given
 a positive definite matrix A:
-\deqn{$max_{v} v^T A v$}{max_{v} t(v)*A*v }
+\deqn{max_{v} v^T A v}{max_{v} t(v)*A*v }
 subject to
-\deqn{$||v||_2 \leq 1, ||v||_1 \leq s$}{||v||_2 <= 1, ||v||_1 <= s}
+\deqn{||v||_2 \leq 1, ||v||_1 \leq s}{||v||_2 <= 1, ||v||_1 <= s}
 The solution v is the sparse leading eigenvector, and the corresponding objective
-\eqn{$v^T A v$}{t(v)*A*v} is the sparse leading engenvalue.
+\eqn{v^T A v}{t(v)*A*v} is the sparse leading eigenvalue.
 }
 \seealso{
 \code{symmPMD()}.
